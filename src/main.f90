@@ -1,12 +1,12 @@
 PROGRAM nbody_hermite
-! Written 24/08/2018 by dh4gan
-! Code implements a 4th order Hermite integration of a pure N-Body system
+  ! Written 24/08/2018 by dh4gan
+  ! Code implements a 4th order Hermite integration of a pure N-Body system
 
-use nbodydata
+  use nbodydata
 
-IMPLICIT NONE
+  implicit none
 
-! Print code header
+  ! Print code header
 
   !             Display header
   print*, " "
@@ -23,47 +23,47 @@ IMPLICIT NONE
      paramfile = 'nbody_hermite.params'
      print*, 'Reverting to default'
   endif
- 
+
   print*, " input parameters to be read from ",trim(paramfile)
   print*, "-----------------------------------------------"
   call sleep(1)
 
 
-! Read in parameter file and setup bodies
+  ! Read in parameter file and setup bodies
 
-call initial
+  call initial
 
-! Begin loop
+  ! Begin loop
 
-t = 0.0
-dt = 1.0e-3
-tdump = tsnap
+  t = 0.0
+  dt = 1.0e-3
+  tdump = tsnap
 
-! Output initial conditions
-snapshotcounter = 0
-call output(snapshotcounter)
+  ! Output initial conditions
+  snapshotcounter = 0
+  call output(snapshotcounter)
 
-! Begin integration
-do while(t<tend)
+  ! Begin integration
+  do while(t<tend)
 
-   call integrate(dt,pos,vel,newpos,newvel)
+     call integrate(dt,pos,vel,newpos,newvel)
 
-   pos = newpos
-   vel = newvel
+     pos = newpos
+     vel = newvel
 
-   t = t + dt
+     t = t + dt
 
-   if (t>tdump) then
-         write(*,'(A,1P,2E12.3,A)') 't, dt=',t/twopi,dt/twopi, ' years'
-      snapshotcounter = snapshotcounter + 1
-      call output(snapshotcounter)
-      tdump = tdump + tsnap
-   endif
-   
-enddo
+     if (t>tdump) then
+        write(*,'(A,1P,2E12.3,A)') 't, dt=',t/twopi,dt/twopi, ' years'
+        snapshotcounter = snapshotcounter + 1
+        call output(snapshotcounter)
+        tdump = tdump + tsnap
+     endif
 
-! Once integration complete, close all files and exit
+  enddo
 
-call endrun
+  ! Once integration complete, close all files and exit
+
+  call endrun
 
 END PROGRAM nbody_hermite
