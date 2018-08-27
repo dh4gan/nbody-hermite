@@ -1,54 +1,44 @@
-subroutine timestep(position,velocity)
-! Adjusts the timestep based on a standard step doubling algorithm
-! Takes two half timesteps and compares to the current result
+subroutine timestep(deltat,acceleration,jerk,snap,crackle)
 
 use nbodydata
 
 implicit none
 
-real,dimension(3,N),intent(in) :: position,velocity
+real,dimension(3,N),intent(in) :: acceleration,jerk,snap,crackle
+real, intent(out) :: deltat
 
-real :: halfdt,error
-real, dimension(3,N) :: testpos1,testvel1,testpos2,testvel2
+real :: dt_i,amag,jmag,smag,cmag
 
-halfdt = dt/2
+deltat = 1.0e30
+amag = 0.0
+jmag = 0.0
+smag = 0.0
+cmag = 0.0
 
-call integrate(halfdt,pos,vel,testpos1,testvel1)
-call integrate(halfdt,testpos1,testvel1,testpos2,testvel2)
-
-! Compute error between half timestep and full timestep for each particle
-
-error = 0.0
-maxerror = -1.0e30
 
 do ibody=1,N
 
-   error = 0.0
-   do ix=1,3
-
-      error = error + (position(ix,ibody)-testpos2(ix,ibody))*(position(ix,ibody)-testpos2(ix,ibody))
-      error = error + (velocity(ix,ibody)-testvel2(ix,ibody))*(velocity(ix,ibody)-testvel2(ix,ibody))
-   enddo
-
-   error = sqrt(error)
-
-   if(error>maxerror) maxerror = error
+do ix=1,3
+    amag = amag + acceleration(ix,ibody)*acceleration(ix,ibody)
+    jmag = jmag + jerk(ix,ibody)*jerk(ix,ibody)
+    smag = smag + snap(ix,ibody)*snap(ix,ibody)
+    cmag = cmag + crackle(ix,ibody)*crackle(ix,ibody)
 enddo
 
-! Compute new deltat based on this error level
-! If current error below user defined tolerance, then dt is increased
-! If current error above tolerance, then dt is decreased
+amag = sqrt(amag)
+jmag = sqrt(jmag)
+smag = sqrt(smag)
+cmag = sqrt(cmag)
 
-
-dt = dt*abs(tolerance/maxerror)**0.2
-
-if(maxerror>tolerance) then
-   !print*,'error too large'
-   !print*,tolerance,maxerror,dt
-   dt = dt*0.1
+if(cmag/jmag + smag/jmag > 1.0e-40) then
+    dt_i = sqrt(tolerance*(amag/jmag + jmag/smag)/(cmag/smag + smag/jmag))
+else
+    dt_i = 1.0e30
 endif
 
-! Stops timesteps getting too big - ensures at least 10 timesteps per output
-if (dt > tsnap) dt = tsnap/10.0
+if (dt_i < deltat) deltat = dt_i
+
+enddo
+
 
 end subroutine timestep

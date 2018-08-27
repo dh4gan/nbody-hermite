@@ -1,52 +1,64 @@
-subroutine integrate(deltat, position,velocity,newposition,newvelocity)
-! This subroutine drives the RK4 integration
+subroutine integrate(deltat,position,velocity,newposition,newvelocity)
+! This subroutine drives the 4th-order Hermite integration (and timestep calculation)
+! The integration proceeds via a predictor-corrector algorithm
 
 use nbodydata
 implicit none
 
-real, intent(in) :: deltat
 real, dimension(3,N), intent(in) :: position,velocity
-
 real,dimension(3,N),intent(out) :: newposition,newvelocity
-real,dimension(3,N) :: nextpos,nextvel
-real,dimension(3,N) :: k1vel, k2vel, k3vel, k4vel
-real,dimension(3,N) :: k1pos, k2pos, k3pos, k4pos
+real, intent(out) :: deltat
 
-! Begin calculating k-coefficients (for velocity and position)
+real, dimension(3,N) :: position_p,velocity_p
+real, dimension(3,N) :: acceleration,jerk,snap,crackle
+real, dimension(3,N) :: acceleration_p,jerk_p
 
-! First k-coeff for velocity = acceleration
-call calc_acceleration(position,velocity,k1vel)
+real :: dt2,dt3
+logical :: calc_snapcrackle
 
-! First k-coeff for position = velocity
-k1pos(:,:) = velocity(:,:)
+position_p(:,:) = 0.0
+velocity_p(:,:) = 0.0
 
-! Second k-coeff for velocity = acceleration at r=pos + 0.5*dt*k1pos
-nextpos = position(:,:) + 0.5*deltat*k1pos(:,:)
-nextvel = velocity(:,:) + 0.5*deltat*k1vel(:,:)
+acceleration(:,:) = 0.0
+acceleration_p(:,:) = 0.0
 
-call calc_acceleration(nextpos,nextvel,k2vel)
+jerk(:,:) = 0.0
+jerk_p(:,:) = 0.0
 
-! Second k-coeff for position = vvelocity + 0.5*k1vel
-k2pos(:,:) = velocity(:,:) + 0.5*deltat*k1vel(:,:)
+snap(:,:) = 0.0
+crackle(:,:) = 0.0
 
-! Third velocity k-coeff
-nextpos = position(:,:) + 0.5*deltat*k2pos(:,:)
-nextvel = velocity(:,:) + 0.5*deltat*k2vel(:,:)
-call calc_acceleration(nextpos,nextvel,k3vel)
+! ***********************************
+! 1. Predict positions and velocities
+! ***********************************
 
-! Third position k-coeff
-k3pos(:,:) = velocity(:,:) + 0.5*deltat*k2vel(:,:)
+! Compute accelerations, jerks, snaps and crackles at this timestep
 
-! Fourth velocity k-coeff
-nextpos = position(:,:)+ deltat*k3pos(:,:)
-nextvel = velocity(:,:) + deltat*k3vel(:,:)
-call calc_acceleration(nextpos,nextvel,k4vel)
+calc_snapcrackle = .true.
+call calc_acceleration(position,velocity,acceleration,jerk,snap,crackle,calc_snapcrackle)
 
-! Fourth position k-coeff
-k4pos(:,:) = velocity(:,:) + deltat*k3vel(:,:)
+! Compute timestep
+call timestep(deltat,acceleration,jerk,snap,crackle)
 
-! New position and velocity
-newposition(:,:) = position(:,:) + (deltat/6.0)*(k1pos(:,:) + 2.0*k2pos(:,:) + 2.0*k3pos(:,:) + k4pos(:,:))
-newvelocity(:,:) = velocity(:,:) + (deltat/6.0)*(k1vel(:,:) + 2.0*k2vel(:,:) + 2.0*k3vel(:,:) + k4vel(:,:))
+dt2 = deltat*deltat
+dt3 = deltat*deltat*deltat
+
+! Compute predicted positions and velocities for the next timestep
+position_p(:,:) = position(:,:) + velocity(:,:)*deltat + 0.5*acceleration(:,:)*dt2 + 0.1666*jerk(:,:)*dt3
+velocity_p(:,:) = velocity(:,:) + acceleration(:,:)*deltat + 0.5*jerk(:,:)*dt2
+
+! *************************************
+! 2. Correct positions and velocities
+! *************************************
+
+! Compute accelerations, and jerks based on predicted position, velocity
+calc_snapcrackle = .false. ! Don't calculate snap and crackle this time
+
+call calc_acceleration(position_p,velocity_p, acceleration_p, jerk_p,snap,crackle,calc_snapcrackle)
+
+! Compute corrected positions and velocities
+newvelocity(:,:) = velocity(:,:) + 0.5*(acceleration(:,:)+acceleration_p(:,:)) * deltat + 0.0833* (jerk(:,:)+jerk_p(:,:))*dt2
+
+newposition(:,:) = position(:,:) + 0.5*(velocity(:,:)+newvelocity(:,:))*deltat + 0.0833*(acceleration(:,:)+acceleration_p(:,:))*dt2
 
 end subroutine integrate

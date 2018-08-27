@@ -7,7 +7,7 @@ use nbodydata
 implicit none
 integer, intent(in) :: counter
 
-101 format (1P, 22E15.5)
+!101 format (1P, 22E15.5)
 102 format (1P,23E15.5)
 103 format (1P, 7E15.5)
 

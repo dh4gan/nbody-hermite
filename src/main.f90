@@ -1,21 +1,18 @@
-PROGRAM nbody_rk4
-! Written 18/11/2016 by dh4gan
-! This code implements a 4th order Runge Kutta integration of an N-Body system
+PROGRAM nbody_hermite
+! Written 24/08/2018 by dh4gan
+! Code implements a 4th order Hermite integration of a pure N-Body system
 
 use nbodydata
 
 IMPLICIT NONE
 
-real :: totalmass
-
 ! Print code header
-
 
   !             Display header
   print*, " "
   print*, "-----------------------------------------------"
-  print*, "     N-BODY INTEGRATOR (RUNGE KUTTA 4TH ORDER) "
-  print*, "     Created by D.Forgan, 18th November 2016   "
+  print*, "     N-BODY INTEGRATOR (HERMITE 4TH ORDER) "
+  print*, "     Created by D.Forgan, 24th August 2018   "
   print*, "-----------------------------------------------"
   print*, " "
   print*, "-----------------------------------------------"
@@ -23,7 +20,7 @@ real :: totalmass
 
   if(paramfile=='') then
      print*, 'Parameter file name not found from command line'
-     paramfile = 'nbody_rk4.params'
+     paramfile = 'nbody_hermite.params'
      print*, 'Reverting to default'
   endif
  
@@ -49,20 +46,7 @@ call output(snapshotcounter)
 ! Begin integration
 do while(t<tend)
 
-   ! If in heliocentric mode, transform to that frame TODO
-   if(heliocentric=='y') then
-      call calc_heliocentric_frame(totalmass)
-   endif
-
    call integrate(dt,pos,vel,newpos,newvel)
-
-   ! Do a timestep check before updating position,velocity
-   call timestep(newpos,newvel)
-
-   ! IF timestep passes tolerance, update positions
-   ! Otherwise, repeat step with new dt
-
-   if(maxerror > tolerance) cycle
 
    pos = newpos
    vel = newvel
@@ -70,7 +54,7 @@ do while(t<tend)
    t = t + dt
 
    if (t>tdump) then
-         write(*,'(A,1P,2E12.3,A)'), 't, dt=',t/twopi,dt/twopi, ' years'
+         write(*,'(A,1P,2E12.3,A)') 't, dt=',t/twopi,dt/twopi, ' years'
       snapshotcounter = snapshotcounter + 1
       call output(snapshotcounter)
       tdump = tdump + tsnap
@@ -82,4 +66,4 @@ enddo
 
 call endrun
 
-END PROGRAM nbody_rk4
+END PROGRAM nbody_hermite
