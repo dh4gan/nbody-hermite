@@ -1,9 +1,9 @@
 # Written 29/11/16 by dh4gan
-# Plots data from nbody_rk4
+# Plots data from nbody_hermite
 # Handles single body file formats
 
 
-import io_nbody_rk4 as io
+import io_nbody_hermite as io
 import filefinder as ff
 
 

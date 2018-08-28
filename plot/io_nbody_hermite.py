@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Written 25/11/16 by dh4gan
-# Module contains methods for I/O relating to nbody_rk4 
+# Module contains methods for I/O relating to nbody_hermite 
 # Includes: methods to read in output files (single body, snapshot, log)
 #        Future methods to include ability to write setup files
 
