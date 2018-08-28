@@ -1,4 +1,4 @@
-#N-Body evolution via 4th-order Hermite Integration #
+# N-Body evolution via 4th-order Hermite Integration #
 ----------------------------------------------------
 
 This FORTRAN 90 repository sets up N gravitating bodies and solves their equation
