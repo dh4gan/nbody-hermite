@@ -167,15 +167,6 @@ subroutine calc_acceleration(position,velocity,acceleration,jerk,snap,crackle, c
 
   endif
 
-  !print*, r3(1,2), r2(1,2), relpos(1,2), position(:,1), position(:,2)
-  print*, 'POSITION: ',position(:,2), relpos(1,2)
-  !print*, 'VELOCITY: ', velocity(:,2)
-  print*, 'ACCELERATION: ', acceleration(:,2)
-  !print*, 'JERK: ', jerk(:,2)
-  !print*, 'SNAP: ', snap(:,2)
-  !print*, 'CRACKLE: ', crackle(:,2)
-
-  !STOP
   return
 
 end subroutine calc_acceleration

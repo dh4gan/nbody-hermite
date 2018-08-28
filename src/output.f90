@@ -37,7 +37,7 @@ else
    ! or output individual bodies to separate files
 
    do ibody=1,N
-        print*, ibody, pos(:,ibody), acc(:,ibody)
+       
       write(ibody+ilog,102) t/twopi, mass(ibody),pos(:,ibody), vel(:,ibody), acc(:,ibody),&
 semimaj(ibody),ecc(ibody),inc(ibody),longascend(ibody),argper(ibody),trueanom(ibody), &
 ekin(ibody),epot(ibody),etot(ibody),angmom(:,ibody)
