@@ -62,10 +62,10 @@ subroutine integrate(deltat,position,velocity,newposition,newvelocity)
   ! Compute corrected positions and velocities
   newvelocity(:,:) = velocity(:,:) &
        + 0.5*(acceleration(:,:)+acceleration_p(:,:)) * deltat &
-       + 0.0833* (jerk(:,:)+jerk_p(:,:))*dt2
+       + 0.0833* (jerk(:,:)-jerk_p(:,:))*dt2
 
   newposition(:,:) = position(:,:) &
        + 0.5*(velocity(:,:)+newvelocity(:,:))*deltat &
-       + 0.0833*(acceleration(:,:)+acceleration_p(:,:))*dt2
+       + 0.0833*(acceleration(:,:)-acceleration_p(:,:))*dt2
 
 end subroutine integrate

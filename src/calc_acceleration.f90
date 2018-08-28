@@ -52,8 +52,8 @@ subroutine calc_acceleration(position,velocity,acceleration,jerk,snap,crackle, c
 
         ! Compute relative separation of ibody and jbody
         do ix=1,3
-           rsep(ix,ibody,jbody) = position(ix,ibody) - position(ix,jbody)
-           vsep(ix,ibody,jbody) = velocity(ix,ibody) - velocity(ix,jbody)
+           rsep(ix,ibody,jbody) = position(ix,jbody) - position(ix,ibody)
+           vsep(ix,ibody,jbody) = velocity(ix,jbody) - velocity(ix,ibody)
         enddo
 
         relpos(ibody,jbody) = sqrt(rsep(1,ibody,jbody)*rsep(1,ibody,jbody) + &
@@ -75,8 +75,8 @@ subroutine calc_acceleration(position,velocity,acceleration,jerk,snap,crackle, c
 
         ! Compute acceleration and jerk components
         do ix=1,3
-           accel_ij(ix,ibody,jbody) = - G*mass(jbody)*rsep(ix,ibody,jbody)/r3(ibody,jbody)
-           jerk_ij(ix,ibody,jbody) = -G*mass(jbody)*vsep(ix,ibody,jbody)/r3(ibody,jbody) - &
+           accel_ij(ix,ibody,jbody) = G*mass(jbody)*rsep(ix,ibody,jbody)/r3(ibody,jbody)
+           jerk_ij(ix,ibody,jbody) = G*mass(jbody)*vsep(ix,ibody,jbody)/r3(ibody,jbody) - &
                 3.0*alpha_ij(ibody,jbody)*accel_ij(ix,ibody,jbody)
 
            acceleration(ix,ibody) = acceleration(ix,ibody) + accel_ij(ix,ibody,jbody)
@@ -107,8 +107,8 @@ subroutine calc_acceleration(position,velocity,acceleration,jerk,snap,crackle, c
 
            do ix=1,3
 
-              asep(ix,ibody,jbody) = acceleration(ix,ibody) - acceleration(ix,jbody)
-              jsep(ix,ibody,jbody) = jerk(ix,ibody) - jerk(ix,jbody)
+              asep(ix,ibody,jbody) = acceleration(ix,jbody) - acceleration(ix,ibody)
+              jsep(ix,ibody,jbody) = jerk(ix,jbody) - jerk(ix,ibody)
 
            enddo
 
@@ -136,7 +136,7 @@ subroutine calc_acceleration(position,velocity,acceleration,jerk,snap,crackle, c
                 alpha_ij(ibody,jbody)*alpha_ij(ibody,jbody)
 
 
-           gamma_ij = (3.0*vdotA + rdotJ)/r2(ibody,jbody) + &
+           gamma_ij(ibody,jbody) = (3.0*vdotA + rdotJ)/r2(ibody,jbody) + &
                 alpha_ij(ibody,jbody)*(3.0*beta_ij(ibody,jbody)- alpha_ij(ibody,jbody))
 
 
@@ -151,7 +151,7 @@ subroutine calc_acceleration(position,velocity,acceleration,jerk,snap,crackle, c
                    - 3.0*beta_ij(ibody,jbody)*accel_ij(ix,ibody,jbody)
 
 
-              snap(ix,ibody) = snap(ix,ibody) - snap_ij(ix,ibody,jbody)
+              snap(ix,ibody) = snap(ix,ibody) + snap_ij(ix,ibody,jbody)
 
               crackle_ij(ix,ibody,jbody) = G*mass(jbody)*jsep(ix,ibody,jbody)/r2(ibody,jbody) &
                    - 9.0*alpha_ij(ibody,jbody)*snap_ij(ix,ibody,jbody) &
@@ -159,7 +159,7 @@ subroutine calc_acceleration(position,velocity,acceleration,jerk,snap,crackle, c
                    - 3.0*gamma_ij(ibody,jbody)*accel_ij(ix,ibody,jbody)
 
 
-              crackle(ix,ibody) = crackle(ix,ibody) - crackle_ij(ix,ibody,jbody)
+              crackle(ix,ibody) = crackle(ix,ibody) + crackle_ij(ix,ibody,jbody)
 
            enddo
         enddo ! end loop over jbody
@@ -167,6 +167,15 @@ subroutine calc_acceleration(position,velocity,acceleration,jerk,snap,crackle, c
 
   endif
 
+  !print*, r3(1,2), r2(1,2), relpos(1,2), position(:,1), position(:,2)
+  print*, 'POSITION: ',position(:,2), relpos(1,2)
+  !print*, 'VELOCITY: ', velocity(:,2)
+  print*, 'ACCELERATION: ', acceleration(:,2)
+  !print*, 'JERK: ', jerk(:,2)
+  !print*, 'SNAP: ', snap(:,2)
+  !print*, 'CRACKLE: ', crackle(:,2)
+
+  !STOP
   return
 
 end subroutine calc_acceleration

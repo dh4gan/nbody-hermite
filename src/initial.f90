@@ -11,6 +11,9 @@ real :: nfiles
 character(1) :: zerostring
 character(1) :: varformat
 
+logical :: calc_snapcrackle
+real, allocatable,dimension(:,:) :: jerk,snap,crackle
+
 
 ! Read the simulation setup from file
 
@@ -29,7 +32,7 @@ read(10,*) varformat
 
 
 ! Allocate arrays to hold particle data
-allocate(pos(3,N),vel(3,N),acc(3,N))
+allocate(pos(3,N),vel(3,N),acc(3,N),jerk(3,N),snap(3,N),crackle(3,N))
 allocate(newpos(3,N),newvel(3,N))
 allocate(angmom(3,N),angmag(N),ekin(N),epot(N),etot(N))
 allocate(mass(N),r(N),semimaj(N),ecc(N),inc(N),tmig(N))
@@ -109,7 +112,8 @@ open(ilog,file=TRIM(outputprefix)//'.log',form='formatted')
 
 ! Calculate initial energy, angular momentum and store
 
-call calc_acceleration(pos,vel,acc)
+calc_snapcrackle = .false.
+call calc_acceleration(pos,vel,acc,jerk,snap,crackle)
 call calc_system_properties
 
 initial_system_ang = system_ang

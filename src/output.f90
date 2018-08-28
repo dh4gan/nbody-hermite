@@ -6,12 +6,15 @@ use nbodydata
 
 implicit none
 integer, intent(in) :: counter
+logical :: calc_snapcrackle
+real, dimension(3,N) :: jerk,snap,crackle
 
 !101 format (1P, 22E15.5)
 102 format (1P,23E15.5)
 103 format (1P, 7E15.5)
 
-call calc_acceleration(pos,vel,acc)
+calc_snapcrackle = .false.
+call calc_acceleration(pos,vel,acc,jerk,snap,crackle,calc_snapcrackle)
 call calc_system_properties
 
 ! Either output timestep as a single snapshot
@@ -34,7 +37,7 @@ else
    ! or output individual bodies to separate files
 
    do ibody=1,N
-        print*, ibody, ibody+ilog, t/twopi, mass(ibody)
+        print*, ibody, pos(:,ibody), acc(:,ibody)
       write(ibody+ilog,102) t/twopi, mass(ibody),pos(:,ibody), vel(:,ibody), acc(:,ibody),&
 semimaj(ibody),ecc(ibody),inc(ibody),longascend(ibody),argper(ibody),trueanom(ibody), &
 ekin(ibody),epot(ibody),etot(ibody),angmom(:,ibody)
