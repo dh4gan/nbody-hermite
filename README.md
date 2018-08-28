@@ -24,10 +24,16 @@ This code was developed and tested on gfortran 8.2.0, and compiled with standard
 
 The code is compiled using `src/Makefile` contained within the repo, i.e. to compile
 `> cd src/`
+
 `> make`
 
 Which produces the `nbody_hermite` executable.  The code is then run with the command
 
 `> ./nbody_hermite <paramfile> `
 
-Where <paramfile> is the parameters file needed to setup the N Body system (example: `nbody_hermite.params`)
+Where <paramfile> is the parameters file needed to setup the N Body system - for an example see `src/nbody_hermite.params`
+  
+### Plotting ###
+----------------
+
+The `plot/` subdirectory contains a set of Python scripts (mostly Python 3.0) to plot both single files, snapshots and the log files that are outputted by the code.  Most of the heavy lifting (data reads, setting up figures) is done in the `io_nbody_hermite` module, which gives useful functions for writing more sophisticated plotting scripts.
