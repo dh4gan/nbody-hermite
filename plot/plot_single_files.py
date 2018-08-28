@@ -7,7 +7,7 @@ import io_nbody_rk4 as io
 import filefinder as ff
 
 
-prefix = raw_input('What is the run prefix? ')
+prefix = input('What is the run prefix? ')
 
 filename = ff.find_local_input_files(prefix+'*')
 io.plot_body(filename, 'single')
