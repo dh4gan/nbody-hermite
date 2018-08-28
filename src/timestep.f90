@@ -30,8 +30,15 @@ subroutine timestep(deltat,acceleration,jerk,snap,crackle)
      smag = sqrt(smag)
      cmag = sqrt(cmag)
 
-     if(cmag/jmag + smag/jmag > 1.0e-40) then
-        dt_i = sqrt(tolerance*(amag/jmag + jmag/smag)/(cmag/smag + smag/jmag))
+     
+     if(amag*smag + jmag*jmag <1.0e-40) then
+        print*, 'ERROR: zero timestep calculated'
+        print*, ibody, pos(:,ibody),amag,smag,jmag,cmag
+        STOP
+     endif
+        
+     if(abs(cmag*jmag + smag*smag) > 1.0e-40) then
+        dt_i = sqrt(tolerance*(amag*smag + jmag*jmag)/(cmag*jmag + smag*smag))
      else
         dt_i = 1.0e30
      endif
