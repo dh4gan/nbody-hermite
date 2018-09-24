@@ -113,7 +113,7 @@ open(ilog,file=TRIM(outputprefix)//'.log',form='formatted')
 ! Calculate initial energy, angular momentum and store
 
 calc_snapcrackle = .false.
-call calc_acceleration(pos,vel,acc,jerk,snap,crackle)
+call calc_acceleration(pos,vel,acc,jerk,snap,crackle,calc_snapcrackle)
 call calc_system_properties
 
 initial_system_ang = system_ang
